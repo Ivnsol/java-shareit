@@ -18,13 +18,13 @@ import static ru.practicum.shareit.user.repository.UserRepositoryImpl.USERS;
 @Component
 public class ItemRepositoryImpl implements ItemRepository {
     private Long id = 1L;
-    public static List<Item> items = new ArrayList<>();
+    public static final List<Item> items = new ArrayList<>();
 
     @Override
     public List<ItemDto> findByUserId(long userId) {
         List<ItemDto> itemsByUserId = new ArrayList<>();
         for (Item item : items) {
-            if (item.getOwner() == userId) {
+            if (item.getOwner().equals(userId)) {
                 itemsByUserId.add(fromItemToItemDto(item));
             }
         }
@@ -34,7 +34,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public ItemDto save(Long userId, ItemDto itemDto) {
         for (User user : USERS) {
-            if (user.getId() == userId) {
+            if (user.getId().equals(userId)) {
                 itemDto.setId(id);
                 items.add(fromItemDtoToItem(userId, itemDto));
                 id++;
@@ -47,7 +47,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public void deleteByUserIdAndItemId(long userId, long itemId) {
         for (Item item : items) {
-            if (item.getId() == userId && item.getId() == itemId) {
+            if (item.getId().equals(userId) && item.getId().equals(itemId)) {
                 items.remove(item);
             }
         }
@@ -57,7 +57,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public ItemDto upadte(long userId, ItemDto itemDto) {
         for (Item item : items) {
-            if (item.getOwner() == userId) {
+            if (item.getOwner().equals(userId)) {
                 if (itemDto.getName() != null) {
                     item.setName(itemDto.getName());
                 }
@@ -77,7 +77,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public ItemDto getItemDto(long userId, Long itemId) {
         for (Item item : items) {
-            if (item.getId() == itemId) {
+            if (item.getId().equals(itemId)) {
                 return fromItemToItemDto(item);
             }
         }

@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 @Repository
 public class UserRepositoryImpl implements UserRepository {
     private static final String EMAIL_REGEX = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-    private static final Pattern pattern = Pattern.compile(EMAIL_REGEX);
     public static final List<User> USERS = new ArrayList<>();
     private Long id = 1L;
 
@@ -23,7 +22,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User get(Long userId) {
         for (User user : USERS) {
-            if (user.getId() == userId) {
+            if (user.getId().equals(userId)) {
                 return user;
             }
         }
@@ -47,7 +46,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void delete(Long id) {
         for (User user : USERS) {
-            if (user.getId() == id) {
+            if (user.getId().equals(id)) {
                 USERS.remove(user);
                 return;
             }
@@ -61,7 +60,7 @@ public class UserRepositoryImpl implements UserRepository {
         for (User user : USERS) {
 
             if (user.getEmail().equals(updateUser.getEmail())) {
-                if (user.getId() != id) {
+                if (!user.getId().equals(id)) {
                     throw new IllegalArgumentException("Such email is already exist");
                 } else {
                     updateFieldsInUser(user, updateUser);
@@ -72,7 +71,7 @@ public class UserRepositoryImpl implements UserRepository {
 
         for (User user2 : USERS) {
 
-            if (user2.getId() == id) {
+            if (user2.getId().equals(id)) {
                 updateFieldsInUser(user2, updateUser);
                 return user2;
             }
