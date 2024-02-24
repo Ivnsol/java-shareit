@@ -6,7 +6,6 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
