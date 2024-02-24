@@ -10,6 +10,7 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static ru.practicum.shareit.item.dto.ItemDto.fromItemToItemDto;
 import static ru.practicum.shareit.item.model.Item.fromItemDtoToItem;
@@ -18,7 +19,7 @@ import static ru.practicum.shareit.user.repository.UserRepositoryImpl.USERS;
 @Component
 public class ItemRepositoryImpl implements ItemRepository {
     private Long id = 1L;
-    public static final List<Item> items = new ArrayList<>();
+    public static final List<Item> items = new CopyOnWriteArrayList<>();
 
     @Override
     public List<ItemDto> findByUserId(long userId) {

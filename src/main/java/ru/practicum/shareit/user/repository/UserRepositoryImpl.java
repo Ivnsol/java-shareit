@@ -4,13 +4,12 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
-    private static final String EMAIL_REGEX = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-    public static final List<User> USERS = new ArrayList<>();
+    public static final List<User> USERS = new CopyOnWriteArrayList<>();
     private Long id = 1L;
 
     @Override
