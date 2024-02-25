@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +40,7 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     public ItemDto getItemDto(@RequestHeader(name = "X-Sharer-User-Id") long userId,
-                              @PathVariable Long itemId) {
+                              @PathVariable Long itemId) throws IllegalAccessException {
         return itemService.getItemDto(userId, itemId);
     }
 

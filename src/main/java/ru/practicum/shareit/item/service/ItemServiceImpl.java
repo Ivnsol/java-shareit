@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -33,7 +34,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getItemDto(long userId, Long itemId) {
+    public ItemDto getItemDto(long userId, Long itemId) throws IllegalAccessException {
         return itemRepository.getItemDto(userId, itemId);
     }
 

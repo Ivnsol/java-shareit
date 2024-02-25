@@ -13,7 +13,7 @@ public interface ItemService {
 
     ItemDto update(long userId, ItemDto itemDto);
 
-    ItemDto getItemDto(long userId, Long itemId);
+    ItemDto getItemDto(long userId, Long itemId) throws IllegalAccessException;
 
     List<ItemDto> getItemByString(long userId, String string);
 

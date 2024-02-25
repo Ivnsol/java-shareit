@@ -8,9 +8,6 @@ import ru.practicum.shareit.item.model.Item;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,11 +20,4 @@ public class ItemDto {
     private String description;
     @NotNull
     private Boolean available;
-
-    public static ItemDto fromItemToItemDto(Item item) {
-        return new ItemDto(item.getId(),
-                item.getName(),
-                item.getDescription(),
-                item.getAvailable());
-    }
 }

@@ -1,10 +1,12 @@
 package ru.practicum.shareit.item.repository;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -12,21 +14,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static ru.practicum.shareit.item.dto.ItemDto.fromItemToItemDto;
-import static ru.practicum.shareit.item.model.Item.fromItemDtoToItem;
 import static ru.practicum.shareit.user.repository.UserRepositoryImpl.USERS;
 
 @Component
+@RequiredArgsConstructor
 public class ItemRepositoryImpl implements ItemRepository {
     private Long id = 1L;
     public static final List<Item> items = new CopyOnWriteArrayList<>();
+
+    private final ItemMapper itemMapper;
+
 
     @Override
     public List<ItemDto> findByUserId(long userId) {
         List<ItemDto> itemsByUserId = new ArrayList<>();
         for (Item item : items) {
             if (item.getOwner().equals(userId)) {
-                itemsByUserId.add(fromItemToItemDto(item));
+                itemsByUserId.add(itemMapper.itemDtoFromItem(item));
             }
         }
         return itemsByUserId;
@@ -37,7 +41,9 @@ public class ItemRepositoryImpl implements ItemRepository {
         for (User user : USERS) {
             if (user.getId().equals(userId)) {
                 itemDto.setId(id);
-                items.add(fromItemDtoToItem(userId, itemDto));
+                Item item = itemMapper.itemFromItemDto(itemDto);
+                item.setOwner(userId);
+                items.add(item);
                 id++;
                 return itemDto;
             }
@@ -68,18 +74,17 @@ public class ItemRepositoryImpl implements ItemRepository {
                 if (itemDto.getAvailable() != null) {
                     item.setAvailable(itemDto.getAvailable());
                 }
-                return fromItemToItemDto(item);
+                return itemMapper.itemDtoFromItem(item);
             }
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Incorrect user ID or item is not exist");
     }
 
-    @SneakyThrows
     @Override
-    public ItemDto getItemDto(long userId, Long itemId) {
+    public ItemDto getItemDto(long userId, Long itemId) throws IllegalAccessException {
         for (Item item : items) {
             if (item.getId().equals(itemId)) {
-                return fromItemToItemDto(item);
+                return itemMapper.itemDtoFromItem(item);
             }
         }
         throw new IllegalAccessException("Incorrect id");
@@ -93,10 +98,10 @@ public class ItemRepositoryImpl implements ItemRepository {
         for (Item item : items) {
             if (item.getName().toLowerCase().contains(string) &&
                     item.getAvailable() == true) {
-                itemsAfterSearch.add(fromItemToItemDto(item));
+                itemsAfterSearch.add(itemMapper.itemDtoFromItem(item));
             } else if (item.getDescription().toLowerCase().contains(string) &&
                     item.getAvailable() == true) {
-                itemsAfterSearch.add(fromItemToItemDto(item));
+                itemsAfterSearch.add(itemMapper.itemDtoFromItem(item));
             }
         }
         return itemsAfterSearch;

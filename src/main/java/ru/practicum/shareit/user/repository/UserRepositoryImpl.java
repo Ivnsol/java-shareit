@@ -1,16 +1,21 @@
 package ru.practicum.shareit.user.repository;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Repository
+@RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
     public static final List<User> USERS = new CopyOnWriteArrayList<>();
     private Long id = 1L;
+
+    private final UserMapper userMapper;
 
     @Override
     public List<User> findAll() {
