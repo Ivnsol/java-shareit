@@ -14,8 +14,8 @@ public interface UserRepository {
     User save(User user) throws HttpClientErrorException;
 
     @SneakyThrows
-    void delete(Long id);
+    void delete(Long id) throws IllegalAccessException;
 
     @SneakyThrows
-    User update(Long id, User updateUser);
+    User update(Long id, User updateUser) throws IllegalAccessException;
 }

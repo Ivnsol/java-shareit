@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +27,7 @@ public class ItemController {
 
     @DeleteMapping("/{itemId}")
     public void deleteItem(@RequestHeader(name = "X-Sharer-User-Id") long userId,
-                           @PathVariable long itemId) {
+                           @PathVariable long itemId) throws IllegalAccessException {
         itemService.deleteItem(userId, itemId);
     }
 

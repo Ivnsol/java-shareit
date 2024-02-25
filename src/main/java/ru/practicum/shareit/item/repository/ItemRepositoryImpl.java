@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.repository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -11,8 +10,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static ru.practicum.shareit.user.repository.UserRepositoryImpl.USERS;
 
@@ -20,7 +19,7 @@ import static ru.practicum.shareit.user.repository.UserRepositoryImpl.USERS;
 @RequiredArgsConstructor
 public class ItemRepositoryImpl implements ItemRepository {
     private Long id = 1L;
-    public final List<Item> items = new CopyOnWriteArrayList<>();
+    public final List<Item> items = new ArrayList<>();
 
     private final ItemMapper itemMapper;
 
@@ -52,15 +51,18 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public void deleteByUserIdAndItemId(long userId, long itemId) {
-        for (Item item : items) {
+    public void deleteByUserIdAndItemId(long userId, long itemId) throws IllegalAccessException {
+        Iterator<Item> itemIterator = items.listIterator();
+        while (itemIterator.hasNext()) {
+            Item item = itemIterator.next();
             if (item.getId().equals(userId) && item.getId().equals(itemId)) {
-                items.remove(item);
+                itemIterator.remove();
+                return;
             }
         }
+        throw new IllegalAccessException("Incorrect id");
     }
 
-    @SneakyThrows
     @Override
     public ItemDto upadte(long userId, ItemDto itemDto) {
         for (Item item : items) {

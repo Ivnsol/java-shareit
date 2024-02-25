@@ -11,7 +11,7 @@ public interface UserService {
 
     User saveUser(User user);
 
-    void delete(Long id);
+    void delete(Long id) throws IllegalAccessException;
 
-    User update(Long id, User user);
+    User update(Long id, User user) throws IllegalAccessException;
 }

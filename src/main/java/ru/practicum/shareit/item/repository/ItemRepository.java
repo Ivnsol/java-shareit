@@ -8,7 +8,7 @@ public interface ItemRepository {
 
     List<ItemDto> findByUserId(long userId);
 
-    void deleteByUserIdAndItemId(long userId, long itemId);
+    void deleteByUserIdAndItemId(long userId, long itemId) throws IllegalAccessException;
 
     ItemDto upadte(long userId, ItemDto itemDto);
 

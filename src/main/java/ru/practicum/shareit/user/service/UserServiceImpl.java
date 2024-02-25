@@ -28,12 +28,12 @@ class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Long id) throws IllegalAccessException {
         repository.delete(id);
     }
 
     @Override
-    public User update(Long id, User user) {
+    public User update(Long id, User user) throws IllegalAccessException {
         return repository.update(id, user);
     }
 }

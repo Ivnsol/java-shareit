@@ -33,12 +33,12 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public void delete(@PathVariable Long userId) {
+    public void delete(@PathVariable Long userId) throws IllegalAccessException {
         userService.delete(userId);
     }
 
     @PatchMapping("/{userId}")
-    public User update(@PathVariable Long userId, @RequestBody User user) {
+    public User update(@PathVariable Long userId, @RequestBody User user) throws IllegalAccessException {
         return userService.update(userId, user);
     }
 }

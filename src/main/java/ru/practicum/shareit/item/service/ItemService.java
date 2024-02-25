@@ -9,7 +9,7 @@ public interface ItemService {
 
     List<ItemDto> getItems(Long userId);
 
-    void deleteItem(long userId, long itemId);
+    void deleteItem(long userId, long itemId) throws IllegalAccessException;
 
     ItemDto update(long userId, ItemDto itemDto);
 

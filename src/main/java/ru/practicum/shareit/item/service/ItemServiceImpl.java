@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.service;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -24,7 +23,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public void deleteItem(long userId, long itemId) {
+    public void deleteItem(long userId, long itemId) throws IllegalAccessException {
         itemRepository.deleteByUserIdAndItemId(userId, itemId);
     }
 

@@ -1,21 +1,16 @@
 package ru.practicum.shareit.user.repository;
 
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Repository
-@RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
-    public static final List<User> USERS = new CopyOnWriteArrayList<>();
+    public static final List<User> USERS = new ArrayList<>();
     private Long id = 1L;
-
-    private final UserMapper userMapper;
 
     @Override
     public List<User> findAll() {
@@ -45,21 +40,21 @@ public class UserRepositoryImpl implements UserRepository {
         return user;
     }
 
-    @SneakyThrows
     @Override
-    public void delete(Long id) {
-        for (User user : USERS) {
+    public void delete(Long id) throws IllegalAccessException {
+        Iterator<User> userIterator = USERS.listIterator();
+        while (userIterator.hasNext()) {
+            User user = userIterator.next();
             if (user.getId().equals(id)) {
-                USERS.remove(user);
+                userIterator.remove();
                 return;
             }
         }
         throw new IllegalAccessException("Incorrect id");
     }
 
-    @SneakyThrows
     @Override
-    public User update(Long id, User updateUser) {
+    public User update(Long id, User updateUser) throws IllegalAccessException {
         for (User user : USERS) {
 
             if (user.getEmail().equals(updateUser.getEmail())) {
