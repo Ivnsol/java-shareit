@@ -20,7 +20,7 @@ import static ru.practicum.shareit.user.repository.UserRepositoryImpl.USERS;
 @RequiredArgsConstructor
 public class ItemRepositoryImpl implements ItemRepository {
     private Long id = 1L;
-    public static final List<Item> items = new CopyOnWriteArrayList<>();
+    public final List<Item> items = new CopyOnWriteArrayList<>();
 
     private final ItemMapper itemMapper;
 
