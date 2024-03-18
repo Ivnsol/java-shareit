@@ -2,19 +2,26 @@ package ru.practicum.shareit.item.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.user.model.User;
 
+import javax.persistence.*;
 import java.util.Objects;
 
 @Data
 @NoArgsConstructor
+@Entity
+@Table(name = "items")
 public class Item {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String description;
     private Boolean available;
-    private Long owner;
-    private ItemRequest itemRequest;
+    @ManyToOne
+    @JoinColumn(name = "owner")
+    private User owner;
+    //private ItemRequest itemRequest;
 
     @Override
     public boolean equals(Object o) {

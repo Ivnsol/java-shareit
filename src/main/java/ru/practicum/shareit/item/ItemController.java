@@ -1,12 +1,16 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.comment.model.commentDto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/items")
@@ -15,7 +19,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public List<ItemDto> get(@RequestHeader(name = "X-Sharer-User-Id") long userId) {
+    public List<ItemDtoWithBooking> get(@RequestHeader(name = "X-Sharer-User-Id") long userId) {
         return itemService.getItems(userId);
     }
 
@@ -28,24 +32,37 @@ public class ItemController {
     @DeleteMapping("/{itemId}")
     public void deleteItem(@RequestHeader(name = "X-Sharer-User-Id") long userId,
                            @PathVariable long itemId) throws IllegalAccessException {
-        itemService.deleteItem(userId, itemId);
+        itemService.deleteByUserIdAndItemId(userId, itemId);
     }
 
     @PatchMapping("/{itemId}")
     public ItemDto update(@RequestHeader(name = "X-Sharer-User-Id") long userId,
+                          @PathVariable Long itemId,
                           @RequestBody ItemDto itemDto) {
-        return itemService.update(userId, itemDto);
+        return itemService.update(userId, itemId, itemDto);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemDto(@RequestHeader(name = "X-Sharer-User-Id") long userId,
-                              @PathVariable Long itemId) throws IllegalAccessException {
-        return itemService.getItemDto(userId, itemId);
+    public ItemDtoWithBooking getItemDto(@RequestHeader(name = "X-Sharer-User-Id") long userId,
+                                         @PathVariable Long itemId) throws IllegalAccessException {
+        return itemService.getItemDto(itemId, userId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> getItemByString(@RequestHeader(name = "X-Sharer-User-Id") long userId,
                                          @RequestParam(value = "text") String string) {
         return itemService.getItemByString(userId, string);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                 @PathVariable Long itemId, @RequestBody CommentDto commentDto) {
+        return itemService.addComment(userId, itemId, commentDto);
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public NoSuchElementException handleResponseStatusException(final NoSuchElementException e) {
+        return new NoSuchElementException("No such element");
     }
 }
