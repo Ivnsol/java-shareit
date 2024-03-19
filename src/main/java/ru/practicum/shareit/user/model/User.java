@@ -23,6 +23,7 @@ public class User {
     @NotNull
     @Email
     @NotEmpty
+    @Column(unique = true)
     private String email;
 
     @Override
