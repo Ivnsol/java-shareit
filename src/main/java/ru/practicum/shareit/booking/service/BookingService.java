@@ -10,9 +10,9 @@ public interface BookingService {
 
     BookingDto book(long userId, Long bookingId, Boolean approved);
 
-    BookingDto get(Long bookingId, long userId);
+    BookingDto get(Long bookingId, long userId) throws IllegalAccessException;
 
-    List<BookingDto> getAllForUserByState(Long userId, String state);
+    List<BookingDto> getAllForUserByState(Long userId, String state) throws IllegalAccessException;
 
-    List<BookingDto> getAllBookingForOwner(Long userId, String state);
+    List<BookingDto> getAllBookingForOwner(Long userId, String state) throws IllegalAccessException;
 }

@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.comment.model.commentDto.CommentDto;
@@ -10,7 +9,6 @@ import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
 import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/items")
@@ -58,11 +56,5 @@ public class ItemController {
     public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId,
                                  @PathVariable Long itemId, @RequestBody CommentDto commentDto) {
         return itemService.addComment(userId, itemId, commentDto);
-    }
-
-    @ExceptionHandler(NoSuchElementException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public NoSuchElementException handleResponseStatusException(final NoSuchElementException e) {
-        return new NoSuchElementException("No such element");
     }
 }

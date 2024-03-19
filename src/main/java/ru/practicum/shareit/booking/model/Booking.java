@@ -2,8 +2,6 @@ package ru.practicum.shareit.booking.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.enums.StatusOfBooking;
 
 import javax.persistence.*;
@@ -28,10 +26,11 @@ public class Booking {
     private Long itemId;
     private Long booker;
 
-    public void validateDates() {
+    public Boolean validateDates() {
         if (start == null || end == null || start.isAfter(end) ||
                 end.isBefore(start) || start == end || start.equals(end) || start.isBefore(LocalDateTime.now())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            return false;
         }
+        return true;
     }
 }

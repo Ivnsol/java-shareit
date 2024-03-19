@@ -1,16 +1,14 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.enums.State;
 import ru.practicum.shareit.booking.enums.StatusOfBooking;
 import ru.practicum.shareit.booking.mapper.BookingCastomMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingStorage;
-import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -22,8 +20,9 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,57 +40,57 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto create(long userId, Booking booking) {
         try {
-            booking.validateDates();
+            if (!booking.validateDates()) {
+                throw new IllegalStateException();
+            }
             UserDto userDto = userService.get(userId);
 
-            ItemDtoWithBooking itemDto = itemService.getItemDto(booking.getItemId(), userId);
+            ItemDto itemDto = itemMapper.itemDtoFromItem(itemRepository.getById(booking.getItemId()));
 
             if (itemRepository.findById(booking.getItemId()).get().getOwner().getId().equals(userId))
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+                throw new EntityNotFoundException();
 
             if (itemDto.getAvailable().equals(false))
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item not available");
+                throw new IllegalStateException();
 
             booking.setBooker(userId);
             booking.setStatus(StatusOfBooking.WAITING);
             bookingStorage.save(booking);
 
-            BookingDto bookingDto = bookingCastomMapper.dtoFromBooking(booking);
+            BookingDto bookingDto = bookingCastomMapper.dtoFromBooking(booking, itemDto, userDto);
 
             return bookingDto;
-        } catch (EntityNotFoundException | IllegalAccessException ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User or item not found", ex);
+        } catch (EntityNotFoundException ex) {
+            throw new EntityNotFoundException();
         }
     }
 
     @Override
     public BookingDto book(long userId, Long bookingId, Boolean approved) {
         Booking booking = checkExist(bookingId);
-        try {
-            ItemDtoWithBooking itemDto = itemService.getItemDto(booking.getItemId(), userId);
+        Item item = itemRepository.getById(booking.getItemId());
 
-            Item item = itemRepository.getById(booking.getItemId());
+        UserDto owner = userMapper.userDtoFromUser(userRepository.getById(userId));
+        UserDto booker = userMapper.userDtoFromUser(userRepository.getById(booking.getBooker()));
 
-            if (item.getOwner().getId().equals(userId)) {
-                if (approved.equals(true) && booking.getStatus().equals(StatusOfBooking.APPROVED)) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-                }
-                if (approved.equals(true)) {
-                    booking.setStatus(StatusOfBooking.APPROVED);
-                } else {
-                    booking.setStatus(StatusOfBooking.REJECTED);
-                }
-
-                BookingDto bookingDto = bookingCastomMapper.dtoFromBooking(booking);
-
-                bookingStorage.save(booking);
-                return bookingDto;
+        if (item.getOwner().getId().equals(userId)) {
+            if (approved.equals(true) && booking.getStatus().equals(StatusOfBooking.APPROVED)) {
+                throw new IllegalStateException();
             }
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            if (approved.equals(true)) {
+                booking.setStatus(StatusOfBooking.APPROVED);
+            } else {
+                booking.setStatus(StatusOfBooking.REJECTED);
+            }
+
+            BookingDto bookingDto = bookingCastomMapper.dtoFromBooking(booking,
+                    itemMapper.itemDtoFromItem(item), booker);
+
+            bookingStorage.save(booking);
+            return bookingDto;
         }
 
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Incorrect ID of owner");
+        throw new EntityNotFoundException();
 
     }
 
@@ -99,13 +98,14 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto get(Long bookingId, long userId) {
         Booking booking = checkExist(bookingId);
         Item item = itemRepository.getById(booking.getItemId());
-        System.out.println(item);
-        if (booking.getBooker().equals(userId) ||
-                item.getOwner().getId().equals(userId)) {
-            return bookingCastomMapper.dtoFromBooking(booking);
+        ItemDto itemDto = itemMapper.itemDtoFromItem(itemRepository.getById(booking.getItemId()));
+        UserDto userDto = userService.get(booking.getBooker());
+
+        if (booking.getBooker().equals(userId) || item.getOwner().getId().equals(userId)) {
+            return bookingCastomMapper.dtoFromBooking(booking, itemDto, userDto);
         }
 
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Incorrect ID");
+        throw new EntityNotFoundException();
 
     }
 
@@ -118,65 +118,43 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getAllBookingForOwner(Long userId, String stringState) {
         User user = userMapper.userFromUserDto(userService.get(userId));
-        List<Item> items = itemRepository.findAllByOwner(user);
-        List<Long> userItemsId = new ArrayList<>();
-        for (Item item : items) {
-            if (item.getOwner().getId().equals(userId)) userItemsId.add(item.getId());
-        }
+        List<Long> userItemsId = itemRepository.findAllByOwner(user).stream().map(Item::getId).collect(Collectors.toList());
 
-        List<Booking> bookings = bookingStorage.findAll();
         State state = stringToEnum(stringState);
 
-        List<Booking> bookingsForOwner = new ArrayList<>();
+        List<Booking> bookingsForOwner;
 
         if (userItemsId.size() > 0) {
-            for (Booking booking : bookings) {
-                if (userItemsId.contains(booking.getItemId())) bookingsForOwner.add(booking);
-            }
             switch (state) {
                 case ALL:
-                    bookingsForOwner = bookingsForOwner;
+                    bookingsForOwner = bookingStorage.getAllForOwner(userItemsId);
                     break;
                 case CURRENT:
-                    bookingsForOwner = bookingsForOwner
-                            .stream()
-                            .filter(o -> o.getStart().isBefore(LocalDateTime.now()))
-                            .filter(o -> o.getEnd().isAfter(LocalDateTime.now()))
-                            .collect(Collectors.toList());
+                    bookingsForOwner = bookingStorage.getCurrentBookingsForOwner(userItemsId);
                     break;
                 case PAST:
-                    bookingsForOwner = bookingsForOwner
-                            .stream()
-                            .filter(o -> o.getEnd().isBefore(LocalDateTime.now()))
-                            .collect(Collectors.toList());
+                    bookingsForOwner = bookingStorage.getPastBookingsForOwner(userItemsId);
                     break;
                 case FUTURE:
-                    bookingsForOwner = bookingsForOwner
-                            .stream()
-                            .filter(o -> o.getStart().isAfter(LocalDateTime.now()))
-                            .collect(Collectors.toList());
+                    bookingsForOwner = bookingStorage.getFutureBookingsForOwner(userItemsId);
                     break;
                 case WAITING:
-                    bookingsForOwner = bookingsForOwner
-                            .stream()
-                            .filter(o -> o.getStatus().equals(StatusOfBooking.WAITING))
-                            .collect(Collectors.toList());
+                    bookingsForOwner = bookingStorage.findBookingByOwnerAndStatusOrderByEndDesc(userItemsId, StatusOfBooking.WAITING);
                     break;
                 case REJECTED:
-                    bookingsForOwner = bookingsForOwner
-                            .stream()
-                            .filter(o -> o.getStatus().equals(StatusOfBooking.REJECTED))
-                            .collect(Collectors.toList());
+                    bookingsForOwner = bookingStorage.findBookingByOwnerAndStatusOrderByEndDesc(userItemsId, StatusOfBooking.REJECTED);
                     break;
                 default:
                     throw new IllegalArgumentException();
             }
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not have items");
+            throw new IllegalStateException("User does not have items");
         }
+
         return bookingsForOwner.stream()
-                .map(bookingCastomMapper::dtoFromBooking)
-                .sorted(Comparator.comparing(BookingDto::getStart).reversed())
+                .map(booking -> bookingCastomMapper.dtoFromBooking(booking,
+                        itemMapper.itemDtoFromItem(itemRepository.getById(booking.getItemId())),
+                        userMapper.userDtoFromUser(userRepository.getById(booking.getBooker()))))
                 .collect(Collectors.toList());
     }
 
@@ -208,14 +186,16 @@ public class BookingServiceImpl implements BookingService {
         }
 
         return bookings.stream()
-                .map(bookingCastomMapper::dtoFromBooking)
+                .map(booking -> bookingCastomMapper.dtoFromBooking(booking,
+                        itemMapper.itemDtoFromItem(itemRepository.getById(booking.getItemId())),
+                        userMapper.userDtoFromUser(userRepository.getById(booking.getBooker()))))
                 .collect(Collectors.toList());
     }
 
 
     private Booking checkExist(Long bookingId) {
         Optional<Booking> booking = bookingStorage.findById(bookingId);
-        if (booking.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Incorrect ID");
+        if (booking.isEmpty()) throw new EntityNotFoundException("Incorrect ID");
         return booking.get();
     }
 

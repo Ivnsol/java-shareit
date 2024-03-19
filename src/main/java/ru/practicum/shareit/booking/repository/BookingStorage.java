@@ -13,19 +13,12 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByBookerOrderByEndDesc(Long owner);
 
-    @Query("SELECT b FROM Booking b JOIN Item i ON b.itemId = i.id WHERE i.owner = :owner AND b.status = :state ORDER BY b.start DESC")
-    List<Booking> findByOwnerAndStatusOrderByStartDesc(Long owner, StatusOfBooking state);
-
     List<Booking> findBookingByBookerAndStatusOrderByEndDesc(Long booker, StatusOfBooking status);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.booker = :id AND b.end < :currentTime AND upper(b.status) = UPPER('APPROVED')" +
             "ORDER BY b.start DESC")
     List<Booking> getByBookerIdStatePast(@Param("id") Long id, @Param("currentTime") LocalDateTime currentTime);
-
-    @Query("SELECT b FROM Booking b WHERE b.booker = :userId AND b.end >= :currentTime AND :currentTime >= b.start " +
-            "ORDER BY b.start DESC")
-    List<Booking> getByBookerIdStateCurrent(@Param("userId") Long userId, @Param("currentTime") LocalDateTime currentTime);
 
     @Query("SELECT b FROM Booking b WHERE b.booker = :userId AND b.end > CURRENT_TIMESTAMP " +
             "AND b.start < CURRENT_TIMESTAMP ORDER BY b.start DESC")
@@ -39,10 +32,31 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
             "AND b.end > CURRENT_TIMESTAMP ORDER BY b.start DESC")
     List<Booking> getFutureBookingsForBooker(@Param("userId") Long userId);
 
+    @Query("SELECT b FROM Booking b WHERE b.itemId IN :itemsId ORDER BY b.end DESC")
+    List<Booking> getAllForOwner(List<Long> itemsId);
+
+    @Query("SELECT b FROM Booking b WHERE b.itemId IN :itemsId AND b.end > CURRENT_TIMESTAMP " +
+            "AND b.start < CURRENT_TIMESTAMP ORDER BY b.start DESC")
+    List<Booking> getCurrentBookingsForOwner(@Param("itemsId") List<Long> itemsId);
+
+    @Query("SELECT b FROM Booking b WHERE b.itemId IN :itemsId AND b.end < CURRENT_TIMESTAMP " +
+            "AND b.start < CURRENT_TIMESTAMP ORDER BY b.start DESC")
+    List<Booking> getPastBookingsForOwner(@Param("itemsId") List<Long> itemsId);
+
+    @Query("SELECT b FROM Booking b WHERE b.itemId IN :itemsId AND b.start >= CURRENT_TIMESTAMP " +
+            "ORDER BY b.start DESC")
+    List<Booking> getFutureBookingsForOwner(@Param("itemsId") List<Long> itemsId);
+
+    @Query("SELECT b FROM Booking b WHERE b.itemId IN :itemsId AND b.status = :status ORDER BY b.start DESC")
+    List<Booking> findBookingByOwnerAndStatusOrderByEndDesc(@Param("itemsId") List<Long> itemsId, @Param("status") StatusOfBooking status);
+
+
+    @Query("SELECT b FROM Booking b WHERE b.itemId IN :itemsId ORDER BY b.end DESC")
+    List<Booking> findAllWhereItemIdIsOrderByEndDesc(List<Long> itemsId);
+
+
     Booking findFirstByItemIdAndStartBeforeAndStatusIsNotOrderByEndDesc(Long itemId, LocalDateTime end, StatusOfBooking status);
 
     Booking findFirstByItemIdAndStartAfterAndStatusIsNotOrderByEndAsc(Long itemId, LocalDateTime start, StatusOfBooking status);
-
-    Booking getTopByItemIdAndStartAfterOrderByStartAsc(Long itemId, LocalDateTime start);
 
 }
