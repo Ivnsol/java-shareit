@@ -14,14 +14,13 @@ import java.util.Objects;
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
     private String name;
     private String description;
     private Boolean available;
     @ManyToOne
     @JoinColumn(name = "owner")
     private User owner;
-    //private ItemRequest itemRequest;
 
     @Override
     public boolean equals(Object o) {

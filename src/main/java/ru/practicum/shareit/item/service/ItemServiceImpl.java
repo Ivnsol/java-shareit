@@ -73,7 +73,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public void deleteByUserIdAndItemId(long userId, long itemId) throws IllegalAccessException {
         Item item = itemRepository.getById(itemId);
-        if (item.getOwner().equals(userId)) {
+        if (item.getOwner().getId().equals(userId)) {
             itemRepository.deleteById(itemId);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Incorrect user ID or item is not exist");
