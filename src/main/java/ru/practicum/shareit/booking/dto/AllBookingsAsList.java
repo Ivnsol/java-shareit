@@ -1,18 +1,21 @@
-package ru.practicum.shareit.booking.model;
+package ru.practicum.shareit.booking.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.enums.StatusOfBooking;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
+
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "bookings")
-public class Booking {
+public class AllBookingsAsList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,9 +26,12 @@ public class Booking {
     private LocalDateTime end;
     @Enumerated(EnumType.STRING)
     private StatusOfBooking status;
-    @Column(name = "item_id")
-    private Long itemId;
-    private Long booker;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "item_id")
+    private Item item;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "booker")
+    private User booker;
 
     public Boolean validateDates() {
         if (start == null || end == null || start.isAfter(end) ||
@@ -34,4 +40,5 @@ public class Booking {
         }
         return true;
     }
+
 }

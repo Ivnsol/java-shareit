@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
+import ru.practicum.shareit.booking.dto.AllBookingsAsList;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 
@@ -12,7 +13,7 @@ public interface BookingService {
 
     BookingDto get(Long bookingId, long userId) throws IllegalAccessException;
 
-    List<BookingDto> getAllForUserByState(Long userId, String state) throws IllegalAccessException;
+    List<AllBookingsAsList> getAllForUserByState(Long userId, String state) throws IllegalAccessException;
 
-    List<BookingDto> getAllBookingForOwner(Long userId, String state) throws IllegalAccessException;
+    List<AllBookingsAsList> getAllBookingForOwner(Long userId, String state) throws IllegalAccessException;
 }

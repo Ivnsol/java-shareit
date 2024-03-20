@@ -1,23 +1,18 @@
 package ru.practicum.shareit.booking.mapper;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.booking.dto.AllBookingsAsList;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.mapper.ItemMapper;
-import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.mapper.UserMapper;
-import ru.practicum.shareit.user.repository.UserRepository;
 
 @Component
 @RequiredArgsConstructor
 public class BookingCastomMapper {
-    private final ItemRepository itemRepository;
-    private final UserRepository userRepository;
-    private final ItemMapper itemMapper;
-    private final UserMapper userMapper;
+    private  ModelMapper modelMapper;
 
     public Booking bookingFromDto(BookingDto bookingDto) {
         if (bookingDto == null) {
@@ -37,8 +32,8 @@ public class BookingCastomMapper {
     }
 
     public BookingDto dtoFromBooking(Booking booking,
-                                     ItemDto item,
-                                     UserDto user) {
+                                     ItemDto itemDto,
+                                     UserDto userDto) {
         if (booking == null) {
             return null;
         }
@@ -49,8 +44,16 @@ public class BookingCastomMapper {
         bookingDto.setStart(booking.getStart());
         bookingDto.setEnd(booking.getEnd());
         bookingDto.setStatus(booking.getStatus());
-        bookingDto.setItem(item);
-        bookingDto.setBooker(user);
+        bookingDto.setItem(itemDto);
+        bookingDto.setBooker(userDto);
         return bookingDto;
+    }
+
+    public AllBookingsAsList listFromBookings(Booking booking) {
+        if (booking == null) {
+            return null;
+        }
+
+        return modelMapper.map(booking, AllBookingsAsList.class);
     }
 }

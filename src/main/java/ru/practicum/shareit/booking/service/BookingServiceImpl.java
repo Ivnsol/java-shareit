@@ -2,12 +2,14 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.dto.AllBookingsAsList;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.enums.State;
 import ru.practicum.shareit.booking.enums.StatusOfBooking;
 import ru.practicum.shareit.booking.mapper.BookingCastomMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingStorage;
+import ru.practicum.shareit.booking.repository.BookingStorageForList;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 public class BookingServiceImpl implements BookingService {
     private final UserMapper userMapper;
     private final BookingStorage bookingStorage;
+    private final BookingStorageForList bookingStorageForList;
     private final BookingCastomMapper bookingCastomMapper;
     private final UserService userService;
     private final ItemService itemService;
@@ -45,7 +48,8 @@ public class BookingServiceImpl implements BookingService {
             }
             UserDto userDto = userService.get(userId);
 
-            ItemDto itemDto = itemMapper.itemDtoFromItem(itemRepository.getById(booking.getItemId()));
+            Item item = itemRepository.getById(booking.getItemId());
+            ItemDto itemDto = itemMapper.itemDtoFromItem(item);
 
             if (itemRepository.findById(booking.getItemId()).get().getOwner().getId().equals(userId))
                 throw new EntityNotFoundException();
@@ -53,11 +57,11 @@ public class BookingServiceImpl implements BookingService {
             if (itemDto.getAvailable().equals(false))
                 throw new IllegalStateException();
 
-            booking.setBooker(userId);
+            booking.setBooker(userDto.getId());
             booking.setStatus(StatusOfBooking.WAITING);
             bookingStorage.save(booking);
 
-            BookingDto bookingDto = bookingCastomMapper.dtoFromBooking(booking, itemDto, userDto);
+            BookingDto bookingDto = bookingCastomMapper.dtoFromBooking(booking,itemDto, userDto);
 
             return bookingDto;
         } catch (EntityNotFoundException ex) {
@@ -83,8 +87,7 @@ public class BookingServiceImpl implements BookingService {
                 booking.setStatus(StatusOfBooking.REJECTED);
             }
 
-            BookingDto bookingDto = bookingCastomMapper.dtoFromBooking(booking,
-                    itemMapper.itemDtoFromItem(item), booker);
+            BookingDto bookingDto = bookingCastomMapper.dtoFromBooking(booking, itemMapper.itemDtoFromItem(item), booker);
 
             bookingStorage.save(booking);
             return bookingDto;
@@ -110,39 +113,39 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllForUserByState(Long userId, String state) {
+    public List<AllBookingsAsList> getAllForUserByState(Long userId, String state) {
         State stateEnum = stringToEnum(state);
         return getBookings(userId, stateEnum);
     }
 
     @Override
-    public List<BookingDto> getAllBookingForOwner(Long userId, String stringState) {
+    public List<AllBookingsAsList> getAllBookingForOwner(Long userId, String stringState) {
         User user = userMapper.userFromUserDto(userService.get(userId));
         List<Long> userItemsId = itemRepository.findAllByOwner(user).stream().map(Item::getId).collect(Collectors.toList());
 
         State state = stringToEnum(stringState);
 
-        List<Booking> bookingsForOwner;
+        List<AllBookingsAsList> bookingsForOwner;
 
         if (userItemsId.size() > 0) {
             switch (state) {
                 case ALL:
-                    bookingsForOwner = bookingStorage.getAllForOwner(userItemsId);
+                    bookingsForOwner = bookingStorageForList.getAllForOwner(userItemsId);
                     break;
                 case CURRENT:
-                    bookingsForOwner = bookingStorage.getCurrentBookingsForOwner(userItemsId);
+                    bookingsForOwner = bookingStorageForList.getCurrentBookingsForOwner(userItemsId);
                     break;
                 case PAST:
-                    bookingsForOwner = bookingStorage.getPastBookingsForOwner(userItemsId);
+                    bookingsForOwner = bookingStorageForList.getPastBookingsForOwner(userItemsId);
                     break;
                 case FUTURE:
-                    bookingsForOwner = bookingStorage.getFutureBookingsForOwner(userItemsId);
+                    bookingsForOwner = bookingStorageForList.getFutureBookingsForOwner(userItemsId);
                     break;
                 case WAITING:
-                    bookingsForOwner = bookingStorage.findBookingByOwnerAndStatusOrderByEndDesc(userItemsId, StatusOfBooking.WAITING);
+                    bookingsForOwner = bookingStorageForList.findBookingByOwnerAndStatusOrderByEndDesc(userItemsId, StatusOfBooking.WAITING);
                     break;
                 case REJECTED:
-                    bookingsForOwner = bookingStorage.findBookingByOwnerAndStatusOrderByEndDesc(userItemsId, StatusOfBooking.REJECTED);
+                    bookingsForOwner = bookingStorageForList.findBookingByOwnerAndStatusOrderByEndDesc(userItemsId, StatusOfBooking.REJECTED);
                     break;
                 default:
                     throw new IllegalArgumentException();
@@ -151,45 +154,37 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalStateException("User does not have items");
         }
 
-        return bookingsForOwner.stream()
-                .map(booking -> bookingCastomMapper.dtoFromBooking(booking,
-                        itemMapper.itemDtoFromItem(itemRepository.getById(booking.getItemId())),
-                        userMapper.userDtoFromUser(userRepository.getById(booking.getBooker()))))
-                .collect(Collectors.toList());
+        return bookingsForOwner;
     }
 
-    private List<BookingDto> getBookings(Long userId, State state) {
+    private List<AllBookingsAsList> getBookings(Long userId, State state) {
         Long userIdValue = userService.get(userId).getId();
-        List<Booking> bookings;
+        List<AllBookingsAsList> bookings;
 
         switch (state) {
             case ALL:
-                bookings = bookingStorage.findAllByBookerOrderByEndDesc(userIdValue);
+                bookings = bookingStorageForList.findAllByBookerOrderByEndDesc(userIdValue);
                 break;
             case CURRENT:
-                bookings = bookingStorage.getCurrentBookingsForBooker(userIdValue);
+                bookings = bookingStorageForList.getCurrentBookingsForBooker(userIdValue);
                 break;
             case PAST:
-                bookings = bookingStorage.getPastBookingsForBooker(userIdValue);
+                bookings = bookingStorageForList.getPastBookingsForBooker(userIdValue);
                 break;
             case FUTURE:
-                bookings = bookingStorage.getFutureBookingsForBooker(userIdValue);
+                bookings = bookingStorageForList.getFutureBookingsForBooker(userIdValue);
                 break;
             case WAITING:
-                bookings = bookingStorage.findBookingByBookerAndStatusOrderByEndDesc(userIdValue, StatusOfBooking.WAITING);
+                bookings = bookingStorageForList.findBookingByBookerAndStatusOrderByEndDesc(userIdValue, StatusOfBooking.WAITING);
                 break;
             case REJECTED:
-                bookings = bookingStorage.findBookingByBookerAndStatusOrderByEndDesc(userIdValue, StatusOfBooking.REJECTED);
+                bookings = bookingStorageForList.findBookingByBookerAndStatusOrderByEndDesc(userIdValue, StatusOfBooking.REJECTED);
                 break;
             default:
                 bookings = new ArrayList<>();
         }
 
-        return bookings.stream()
-                .map(booking -> bookingCastomMapper.dtoFromBooking(booking,
-                        itemMapper.itemDtoFromItem(itemRepository.getById(booking.getItemId())),
-                        userMapper.userDtoFromUser(userRepository.getById(booking.getBooker()))))
-                .collect(Collectors.toList());
+        return bookings;
     }
 
 
