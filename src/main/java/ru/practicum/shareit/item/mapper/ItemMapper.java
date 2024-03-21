@@ -10,5 +10,4 @@ public interface ItemMapper {
     Item itemFromItemDto(ItemDto itemDto);
 
     ItemDto itemDtoFromItem(Item item);
-
 }

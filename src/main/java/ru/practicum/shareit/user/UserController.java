@@ -2,15 +2,13 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -23,7 +21,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public User get(@PathVariable Long userId) {
+    public UserDto get(@PathVariable Long userId) {
         return userService.get(userId);
     }
 
@@ -33,12 +31,12 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public void delete(@PathVariable Long userId) throws IllegalAccessException {
+    public void delete(@PathVariable Long userId) throws IllegalArgumentException {
         userService.delete(userId);
     }
 
     @PatchMapping("/{userId}")
-    public User update(@PathVariable Long userId, @RequestBody User user) throws IllegalAccessException {
+    public User update(@PathVariable Long userId, @RequestBody User user) throws IllegalArgumentException {
         return userService.update(userId, user);
     }
 }

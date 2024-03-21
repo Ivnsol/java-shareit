@@ -1,21 +1,8 @@
 package ru.practicum.shareit.user.repository;
 
-import lombok.SneakyThrows;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.List;
+public interface UserRepository extends JpaRepository<User, Long> {
 
-public interface UserRepository {
-    List<User> findAll();
-
-    User get(Long userId);
-
-    User save(User user) throws HttpClientErrorException;
-
-    @SneakyThrows
-    void delete(Long id) throws IllegalAccessException;
-
-    @SneakyThrows
-    User update(Long id, User updateUser) throws IllegalAccessException;
 }
