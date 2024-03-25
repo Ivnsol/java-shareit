@@ -53,6 +53,6 @@ class UserServiceIntegrationTest {
                 .getSingleResult();
 
         User updateUser = new User(userOut.getId(), "user updateName", "user@email.ru");
-        assertThat(userMapper.userDtoFromUser(userService.update(updateUser.getId(),updateUser)), equalTo(userMapper.userDtoFromUser(updateUser)));
+        assertThat(userMapper.userDtoFromUser(userService.update(updateUser.getId(), updateUser)), equalTo(userMapper.userDtoFromUser(updateUser)));
     }
 }

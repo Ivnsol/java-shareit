@@ -82,7 +82,7 @@ class UserControllerTest {
 
     @Test
     void update() throws Exception {
-        when(userService.update(Mockito.any(),Mockito.any())).thenReturn(user);
+        when(userService.update(Mockito.any(), Mockito.any())).thenReturn(user);
 
         mvc.perform(patch("/users/1")
                         .content(mapper.writeValueAsString(user))

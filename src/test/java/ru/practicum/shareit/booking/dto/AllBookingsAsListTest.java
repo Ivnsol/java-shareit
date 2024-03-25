@@ -1,4 +1,5 @@
 package ru.practicum.shareit.booking.dto;
+
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.booking.enums.StatusOfBooking;
 import ru.practicum.shareit.item.model.Item;

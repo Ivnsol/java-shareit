@@ -3,6 +3,8 @@ package ru.practicum.shareit.item.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.enums.StatusOfBooking;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingStorage;
@@ -18,25 +20,18 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.ValidationException;
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
-
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class ItemServiceImplTest {
 
@@ -122,7 +117,7 @@ class ItemServiceImplTest {
         when(userRepository.save(any())).thenReturn(user);
         when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item));
 
-       ItemDtoWithBooking itemDto = new ItemDtoWithBooking(item.getId(), item.getName(),
+        ItemDtoWithBooking itemDto = new ItemDtoWithBooking(item.getId(), item.getName(),
                 item.getDescription(), item.getAvailable(),
                 null, null, Collections.emptyList());
 
@@ -158,7 +153,7 @@ class ItemServiceImplTest {
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
             itemService.deleteByUserIdAndItemId(userId, itemId);
         });
-        assert(exception.getStatus() == HttpStatus.NOT_FOUND);
+        assert (exception.getStatus() == HttpStatus.NOT_FOUND);
         verify(itemRepository, never()).deleteById(anyLong());
     }
 

@@ -46,6 +46,7 @@ public class BookingStorageTest {
         verify(bookingStorage, times(1)).findAllWhereItemIdIsOrderByEndDesc(itemsId);
         assertEquals(expectedBookings, result);
     }
+
     @Test
     void testFindFirstByItemIdAndStartBeforeAndStatusIsNotOrderByEndDesc() {
         Long itemId = 1L;

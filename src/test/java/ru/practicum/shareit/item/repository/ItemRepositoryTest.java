@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.repository;
 
-import org.apache.coyote.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,8 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 class ItemRepositoryTest {
@@ -40,7 +40,7 @@ class ItemRepositoryTest {
     }
 
     @Test
-     public void testFindAllByOwner() {
+    public void testFindAllByOwner() {
         User user = userRepository.save(new User(null, "testUser", "test@example.com"));
         Item item1 = itemRepository.save(new Item(1L, "Item1", "Description1", true, user, null));
         Item item2 = itemRepository.save(new Item(2L, "Item2", "Description2", true, user, null));
@@ -56,7 +56,7 @@ class ItemRepositoryTest {
 
     @Test
     void testFindByNameOrDescriptionContainingIgnoreCase() {
-        User user = userRepository.save(new User(null,"testUser", "test@example.com"));
+        User user = userRepository.save(new User(null, "testUser", "test@example.com"));
         Item item1 = itemRepository.save(new Item(1L, "Item1", "Description1", true, user, null));
         Item item2 = itemRepository.save(new Item(2L, "Item2", "Description2", true, user, null));
         Item item3 = itemRepository.save(new Item(3L, "Other", "other description", true, user, null));
