@@ -54,4 +54,48 @@ public class AllBookingsAsListTest {
         assertEquals(item, booking.getItem());
         assertEquals(booker, booking.getBooker());
     }
+
+    @Test
+    void testValidateDates_NullStart_ReturnsFalse() {
+        AllBookingsAsList booking = new AllBookingsAsList();
+        booking.setStart(null);
+        booking.setEnd(LocalDateTime.now());
+        assertFalse(booking.validateDates());
+    }
+
+    @Test
+    void testValidateDates_NullEnd_ReturnsFalse() {
+        AllBookingsAsList booking = new AllBookingsAsList();
+        booking.setStart(LocalDateTime.now());
+        booking.setEnd(null);
+        assertFalse(booking.validateDates());
+    }
+
+    @Test
+    void testValidateDates_EndBeforeStart_ReturnsFalse() {
+        AllBookingsAsList booking = new AllBookingsAsList();
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime end = start.minusHours(1);
+        booking.setStart(start);
+        booking.setEnd(end);
+        assertFalse(booking.validateDates());
+    }
+
+    @Test
+    void testValidateDates_StartEqualsEnd_ReturnsFalse() {
+        AllBookingsAsList booking = new AllBookingsAsList();
+        LocalDateTime now = LocalDateTime.now();
+        booking.setStart(now);
+        booking.setEnd(now);
+        assertFalse(booking.validateDates());
+    }
+
+    @Test
+    void testValidateDates_StartBeforeNow_ReturnsFalse() {
+        AllBookingsAsList booking = new AllBookingsAsList();
+        LocalDateTime start = LocalDateTime.now().minusHours(1);
+        booking.setStart(start);
+        booking.setEnd(start.plusHours(1));
+        assertFalse(booking.validateDates());
+    }
 }
