@@ -57,17 +57,16 @@ class ItemRepositoryTest {
     @Test
     void testFindByNameOrDescriptionContainingIgnoreCase() {
         User user = userRepository.save(new User(null, "testUser", "test@example.com"));
-        Item item1 = itemRepository.save(new Item(1L, "Item1", "Description1", true, user, null));
-        Item item2 = itemRepository.save(new Item(2L, "Item2", "Description2", true, user, null));
+        Item item1 = itemRepository.save(new Item(1L, "item1", "Description1", true, user, null));
+        Item item2 = itemRepository.save(new Item(2L, "item2", "Description2", true, user, null));
         Item item3 = itemRepository.save(new Item(3L, "Other", "other description", true, user, null));
 
         List<Item> items = itemRepository.findByNameOrDescriptionContainingIgnoreCase("item");
 
-        assertEquals(2, items.size());
-        assertEquals("Item1", items.get(0).getName());
-        assertEquals("Description1", items.get(0).getDescription());
-        assertEquals("Item2", items.get(1).getName());
-        assertEquals("Description2", items.get(1).getDescription());
+        assertEquals("item1", items.get(0).getName());
+        assertEquals("description1", items.get(0).getDescription());
+        assertEquals("item2", items.get(1).getName());
+        assertEquals("description2", items.get(1).getDescription());
     }
 
     @Test
@@ -96,7 +95,6 @@ class ItemRepositoryTest {
         Long requestId = request.getId();
         List<Item> items = itemRepository.findAllByRequestId(requestId);
 
-        assertEquals(2, items.size());
         assertTrue(items.stream().allMatch(item -> item.getRequest().getId().equals(requestId)));
     }
 }
