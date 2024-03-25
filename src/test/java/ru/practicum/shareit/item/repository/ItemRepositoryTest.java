@@ -57,8 +57,8 @@ class ItemRepositoryTest {
     @Test
     void testFindByNameOrDescriptionContainingIgnoreCase() {
         User user = userRepository.save(new User(null, "testUser", "test@example.com"));
-        Item item1 = itemRepository.save(new Item(1L, "item1", "Description1", true, user, null));
-        Item item2 = itemRepository.save(new Item(2L, "item2", "Description2", true, user, null));
+        Item item1 = itemRepository.save(new Item(1L, "item1", "description1", true, user, null));
+        Item item2 = itemRepository.save(new Item(2L, "item2", "description2", true, user, null));
         Item item3 = itemRepository.save(new Item(3L, "Other", "other description", true, user, null));
 
         List<Item> items = itemRepository.findByNameOrDescriptionContainingIgnoreCase("item");
