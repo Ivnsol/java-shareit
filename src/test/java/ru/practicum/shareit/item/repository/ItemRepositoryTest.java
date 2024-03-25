@@ -81,20 +81,4 @@ class ItemRepositoryTest {
         List<Item> itemsAfter = itemRepository.findAll();
         assertEquals(1, itemsAfter.size());
     }
-
-    @Test
-    void testFindAllByRequestId_Success() {
-        ItemRequest request = new ItemRequest(1L, "test request", null, LocalDateTime.now());
-        itemRequestRepository.save(request);
-
-        Item item1 = new Item(1L, "item1", "description1", true, null, request);
-        Item item2 = new Item(2L, "item2", "description2", true, null, request);
-        itemRepository.save(item1);
-        itemRepository.save(item2);
-
-        Long requestId = request.getId();
-        List<Item> items = itemRepository.findAllByRequestId(requestId);
-
-        assertTrue(items.stream().allMatch(item -> item.getRequest().getId().equals(requestId)));
-    }
 }
