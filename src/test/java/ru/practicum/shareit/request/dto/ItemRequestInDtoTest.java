@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 import java.time.Month;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @JsonTest
 class ItemRequestInDtoTest {
@@ -53,4 +55,49 @@ class ItemRequestInDtoTest {
         assertThat(res).extractingJsonPathStringValue("$.created")
                 .isEqualTo(itemRequestInDto.getCreated().toString());
     }
+
+    @Test
+    void testNoArgsConstructor() {
+        ItemRequestInDto itemRequestInDto = new ItemRequestInDto();
+        assertNull(itemRequestInDto.getId());
+        assertNull(itemRequestInDto.getDescription());
+        assertNull(itemRequestInDto.getRequester());
+        assertNull(itemRequestInDto.getCreated());
+    }
+
+    @Test
+    void testAllArgsConstructor() {
+        Long id = 1L;
+        String description = "Test description";
+        User requester = new User();
+        LocalDateTime created = LocalDateTime.now();
+
+        ItemRequestInDto itemRequestInDto = new ItemRequestInDto(id, description, requester, created);
+
+        assertEquals(id, itemRequestInDto.getId());
+        assertEquals(description, itemRequestInDto.getDescription());
+        assertEquals(requester, itemRequestInDto.getRequester());
+        assertEquals(created, itemRequestInDto.getCreated());
+    }
+
+    @Test
+    void testSetterGetterMethods() {
+        ItemRequestInDto itemRequestInDto = new ItemRequestInDto();
+
+        Long id = 1L;
+        String description = "Test description";
+        User requester = new User();
+        LocalDateTime created = LocalDateTime.now();
+
+        itemRequestInDto.setId(id);
+        itemRequestInDto.setDescription(description);
+        itemRequestInDto.setRequester(requester);
+        itemRequestInDto.setCreated(created);
+
+        assertEquals(id, itemRequestInDto.getId());
+        assertEquals(description, itemRequestInDto.getDescription());
+        assertEquals(requester, itemRequestInDto.getRequester());
+        assertEquals(created, itemRequestInDto.getCreated());
+    }
 }
+
