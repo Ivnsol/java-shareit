@@ -33,8 +33,6 @@ class ItemControllerTest {
 
     @MockBean
     ItemService itemService;
-    @MockBean
-    ItemController itemController;
     @Autowired
     private MockMvc mvc;
     @Autowired
