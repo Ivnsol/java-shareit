@@ -51,6 +51,15 @@ public class BookingCastomMapperTest {
     }
 
     @Test
+    void testBookingFromDtoNull() {
+        BookingDto bookingDto = null;
+
+        Booking booking = bookingCastomMapper.bookingFromDto(bookingDto);
+
+        assertNull(booking);
+    }
+
+    @Test
     void testDtoFromBooking() {
         User user = new User(1L, "user name", "user@email.ru");
         Item item = new Item(1L, "item1", "description1", true, user, null);
@@ -86,6 +95,15 @@ public class BookingCastomMapperTest {
 
         assertNotNull(result);
         assertEquals(expected, result);
+    }
+
+    @Test
+    void testListFromBookingsNull() {
+        Booking booking = null;
+
+        AllBookingsAsList result = bookingCastomMapper.listFromBookings(booking);
+
+        assertNull(result);
     }
 
     @Test

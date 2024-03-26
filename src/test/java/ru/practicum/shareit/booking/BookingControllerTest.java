@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,6 +27,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -35,7 +37,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = BookingController.class)
 @AutoConfigureMockMvc
 class BookingControllerTest {
-
+    @InjectMocks
+    BookingController bookingController;
     @MockBean
     BookingServiceImpl bookingService;
     @Autowired
@@ -180,5 +183,29 @@ class BookingControllerTest {
         verify(bookingService, times(1)).getAllForUserByState(anyLong(), any(), any());
     }
 
+    @Test
+    void testGetAllBookingForOwner_InvalidFromValue() {
+        long userId = 1L;
+        String state = "ALL";
+        int from = -1;
+        int size = 10;
 
+        assertThrows(IllegalStateException.class, () -> {
+            bookingController.getAllBookingForOwner(userId, state, from, size);
+        });
+    }
+
+    @Test
+    void testGetAllForUserByState_InvalidFromValue() {
+        // Arrange
+        long userId = 1L;
+        String state = "ALL";
+        int from = -1;
+        int size = 10;
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> {
+            bookingController.getAllForUserByState(userId, state, from, size);
+        });
+    }
 }
