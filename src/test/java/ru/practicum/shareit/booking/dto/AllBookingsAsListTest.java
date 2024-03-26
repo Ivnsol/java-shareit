@@ -98,4 +98,14 @@ public class AllBookingsAsListTest {
         booking.setEnd(start.plusHours(1));
         assertFalse(booking.validateDates());
     }
+
+    @Test
+    void testValidateDates_True() {
+        AllBookingsAsList booking = new AllBookingsAsList();
+        booking.setStart(LocalDateTime.of(2024, 6, 1, 0, 0, 0));
+        booking.setEnd(LocalDateTime.of(2024, 7, 2, 0, 0, 0));
+        boolean result = booking.validateDates();
+
+        assertTrue(result);
+    }
 }

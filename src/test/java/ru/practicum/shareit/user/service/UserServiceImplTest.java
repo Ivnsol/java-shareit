@@ -43,6 +43,27 @@ class UserServiceImplTest {
     }
 
     @Test
+    void testGetUserById_Success() {
+        long userId = 1L;
+        User user = new User(userId, "userName", "user@email.com");
+        UserDto expectedDto = new UserDto(userId, "user@email.com", "userName");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        UserDto resultDto = userService.get(userId);
+
+        assertEquals(expectedDto, resultDto);
+    }
+
+    @Test
+    void testGetUserById_UserNotFound() {
+        long userId = 1L;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class, () -> userService.get(userId));
+    }
+    @Test
     void getAll() {
         when(userRepository.findAll())
                 .thenReturn(Collections.singletonList(user));
