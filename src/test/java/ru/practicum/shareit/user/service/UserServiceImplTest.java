@@ -63,6 +63,7 @@ class UserServiceImplTest {
 
         assertThrows(ResponseStatusException.class, () -> userService.get(userId));
     }
+
     @Test
     void getAll() {
         when(userRepository.findAll())
