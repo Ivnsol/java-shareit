@@ -3,21 +3,22 @@ package ru.practicum.shareit.booking.enumClass;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.booking.enums.State;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class StateTest {
 
     @Test
-    void testStateEnumValues() {
-        assertEquals(8, State.values().length);
+    void testEnumValues() {
+        State[] states = State.values();
 
-        assertEquals(State.ALL, State.valueOf("ALL"));
-        assertEquals(State.CURRENT, State.valueOf("CURRENT"));
-        assertEquals(State.PAST, State.valueOf("PAST"));
-        assertEquals(State.FUTURE, State.valueOf("FUTURE"));
-        assertEquals(State.WAITING, State.valueOf("WAITING"));
-        assertEquals(State.APPROVED, State.valueOf("APPROVED"));
-        assertEquals(State.REJECTED, State.valueOf("REJECTED"));
-        assertEquals(State.CANCELED, State.valueOf("CANCELED"));
+        assertEquals(8, states.length);
+        assertEquals(State.ALL, states[0]);
+        assertEquals(State.CURRENT, states[1]);
+        assertEquals(State.PAST, states[2]);
+        assertEquals(State.FUTURE, states[3]);
+        assertEquals(State.WAITING, states[4]);
+        assertEquals(State.APPROVED, states[5]);
+        assertEquals(State.REJECTED, states[6]);
+        assertEquals(State.CANCELED, states[7]);
     }
 }

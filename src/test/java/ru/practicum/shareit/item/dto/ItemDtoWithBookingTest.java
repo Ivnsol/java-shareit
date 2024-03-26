@@ -14,7 +14,7 @@ import java.time.Month;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
-class CommentDtoTest {
+class ItemDtoWithBookingTest {
 
     @Autowired
     private JacksonTester<CommentDto> json;

@@ -258,4 +258,15 @@ class ItemServiceImplTest {
         assertThrows(ValidationException.class, () -> itemService.addComment(userId, itemId, commentDto));
         verify(commentRepository, never()).save(any());
     }
+
+    @Test
+    public void testGetItemByString_WithEmptyString() {
+        long userId = 123L;
+        String string = "";
+
+        List<ItemDto> result = itemService.getItemByString(userId, string);
+
+        assertEquals(0, result.size());
+    }
+
 }

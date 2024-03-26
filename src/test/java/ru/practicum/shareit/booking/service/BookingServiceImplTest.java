@@ -151,7 +151,7 @@ public class BookingServiceImplTest {
     }
 
     @Test
-    void testGetAllBookingForOwnert() {
+    void testGetAllBookingForOwner() {
         Long userId = 1L;
         String stringState = "ALL";
         Pageable pageRequest = PageRequest.of(0, 10);
@@ -164,6 +164,56 @@ public class BookingServiceImplTest {
         List<AllBookingsAsList> result = bookingService.getAllBookingForOwner(userId, stringState, pageRequest);
 
         verify(bookingStorageForList, times(1)).getAllForOwner(any(), any());
+    }
+
+    @Test
+    void testGetAllBookingForOwnerMost() {
+        Long userId = 1L;
+        String stringState = "ALL";
+        Pageable pageRequest = PageRequest.of(0, 10);
+
+        List<Item> items = new ArrayList<>();
+        items.add(new Item());
+
+        UserDto userDto = new UserDto();
+        when(userService.get(userId)).thenReturn(userDto);
+        when(userMapper.userFromUserDto(userDto)).thenReturn(new User());
+
+        when(itemRepository.findAllByOwner(any())).thenReturn(items);
+
+        List<String> stateValues = List.of("ALL", "CURRENT", "PAST", "FUTURE", "WAITING", "REJECTED");
+        for (String state : stateValues) {
+            List<AllBookingsAsList> result = bookingService.getAllBookingForOwner(userId, state, pageRequest);
+            verifyBookingMethodCalled(state);
+        }
+
+        items.clear();
+        assertThrows(IllegalStateException.class, () -> bookingService.getAllBookingForOwner(userId, stringState, pageRequest));
+    }
+
+    private void verifyBookingMethodCalled(String state) {
+        switch (state) {
+            case "ALL":
+                verify(bookingStorageForList, times(1)).getAllForOwner(any(), any());
+                break;
+            case "CURRENT":
+                verify(bookingStorageForList, times(1)).getCurrentBookingsForOwner(any(), any());
+                break;
+            case "PAST":
+                verify(bookingStorageForList, times(1)).getPastBookingsForOwner(any(), any());
+                break;
+            case "FUTURE":
+                verify(bookingStorageForList, times(1)).getFutureBookingsForOwner(any(), any());
+                break;
+            case "WAITING":
+                verify(bookingStorageForList, times(1)).findBookingByOwnerAndStatusOrderByEndDesc(any(), eq(StatusOfBooking.WAITING), any());
+                break;
+            case "REJECTED":
+                verify(bookingStorageForList, times(1)).findBookingByOwnerAndStatusOrderByEndDesc(any(), eq(StatusOfBooking.REJECTED), any());
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected state value: " + state);
+        }
     }
 
     @Test
@@ -180,5 +230,52 @@ public class BookingServiceImplTest {
 
         bookingService.getAllForUserByState(userId, stringState, pageRequest);
         verify(bookingStorageForList, times(1)).findAllByBookerOrderByEndDesc(any(), any());
+    }
+
+    @Test
+    void testGetAllBookingsForUserMost() {
+        Long userId = 1L;
+        Pageable pageRequest = PageRequest.of(0, 10);
+        List<Item> items = new ArrayList<>();
+        items.add(new Item());
+
+        UserDto userDto = new UserDto();
+        when(userService.get(userId)).thenReturn(userDto);
+        when(userMapper.userFromUserDto(userDto)).thenReturn(new User());
+
+        when(itemRepository.findAllByOwner(any())).thenReturn(items);
+
+        List<String> stateValues = List.of("ALL", "CURRENT", "PAST", "FUTURE", "WAITING", "REJECTED");
+        for (String state : stateValues) {
+            bookingService.getAllForUserByState(userId, state, pageRequest);
+            verifyBookingUserMethodCalled(state);
+        }
+
+        assertThrows(IllegalArgumentException.class, () -> bookingService.getAllForUserByState(userId, "UNKNOWN", pageRequest));
+    }
+
+    private void verifyBookingUserMethodCalled(String state) {
+        switch (state) {
+            case "ALL":
+                verify(bookingStorageForList, times(1)).findAllByBookerOrderByEndDesc(any(), any());
+                break;
+            case "CURRENT":
+                verify(bookingStorageForList, times(1)).getCurrentBookingsForBooker(any(), any());
+                break;
+            case "PAST":
+                verify(bookingStorageForList, times(1)).getPastBookingsForBooker(any(), any());
+                break;
+            case "FUTURE":
+                verify(bookingStorageForList, times(1)).getFutureBookingsForBooker(any(), any());
+                break;
+            case "WAITING":
+                verify(bookingStorageForList, times(1)).findBookingByBookerAndStatusOrderByEndDesc(any(), eq(StatusOfBooking.WAITING), any());
+                break;
+            case "REJECTED":
+                verify(bookingStorageForList, times(1)).findBookingByBookerAndStatusOrderByEndDesc(any(), eq(StatusOfBooking.REJECTED), any());
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected state value: " + state);
+        }
     }
 }
