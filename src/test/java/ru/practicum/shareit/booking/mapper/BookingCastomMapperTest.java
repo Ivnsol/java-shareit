@@ -87,4 +87,36 @@ public class BookingCastomMapperTest {
         assertNotNull(result);
         assertEquals(expected, result);
     }
+
+    @Test
+    void testDtoFromBooking2() {
+        Booking booking = new Booking();
+        booking.setId(1L);
+        booking.setStart(LocalDateTime.now());
+        booking.setEnd(LocalDateTime.now().plusHours(1));
+        booking.setStatus(StatusOfBooking.APPROVED);
+
+        ItemDto itemDto = new ItemDto(1L, "Item", "Description", true, null);
+        UserDto userDto = new UserDto(1L, "User", "user@example.com");
+
+        BookingDto bookingDto = bookingCastomMapper.dtoFromBooking(booking, itemDto, userDto);
+
+        assertEquals(booking.getId(), bookingDto.getId());
+        assertEquals(booking.getStart(), bookingDto.getStart());
+        assertEquals(booking.getEnd(), bookingDto.getEnd());
+        assertEquals(booking.getStatus(), bookingDto.getStatus());
+        assertEquals(itemDto, bookingDto.getItem());
+        assertEquals(userDto, bookingDto.getBooker());
+    }
+
+    @Test
+    void testDtoFromBooking_NullInput() {
+        Booking booking = null;
+        ItemDto itemDto = new ItemDto(1L, "Item", "Description", true, null);
+        UserDto userDto = new UserDto(1L, "User", "user@example.com");
+
+        BookingDto bookingDto = bookingCastomMapper.dtoFromBooking(booking, itemDto, userDto);
+
+        assertNull(bookingDto);
+    }
 }
