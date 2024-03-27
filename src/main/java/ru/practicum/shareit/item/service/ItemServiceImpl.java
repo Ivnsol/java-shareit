@@ -16,9 +16,12 @@ import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -32,7 +35,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingStorage bookingStorage;
     private final CommentRepository commentRepository;
-    private final CommentMapper commentMapper;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public List<ItemDtoWithBooking> getItems(Long userId) {
@@ -63,8 +66,15 @@ public class ItemServiceImpl implements ItemService {
         if (user.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id " + userId + " not found");
 
+        ItemRequest request = null;
+        if (itemDto.getRequestId() != null) {
+            request = itemRequestRepository.findById(itemDto.getRequestId()).orElseThrow(() ->
+                    new EntityNotFoundException(String.format("Запрос с id = %d не найден!", itemDto.getRequestId())));
+        }
+
         Item item = itemMapper.itemFromItemDto(itemDto);
         item.setOwner(userRepository.getById(userId));
+        item.setRequest(request);
         itemRepository.save(item);
         itemDto.setId(item.getId());
         return itemDto;
@@ -165,5 +175,4 @@ public class ItemServiceImpl implements ItemService {
     private List<Comment> getCommentsByItemId(Item item) {
         return commentRepository.getByItem_IdOrderByCreatedDesc(item.getId());
     }
-
 }

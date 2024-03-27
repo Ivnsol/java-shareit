@@ -37,15 +37,33 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<AllBookingsAsList> getAllBookingForOwner(@RequestHeader(name = "X-Sharer-User-Id") long userId,
-                                                         @RequestParam(value = "state", defaultValue = "ALL") String state) throws IllegalAccessException {
-        return bookingService.getAllBookingForOwner(userId, state);
+                                                         @RequestParam(value = "state", defaultValue = "ALL")
+                                                         String state,
+                                                         @RequestParam(name = "from", defaultValue = "0")
+                                                         Integer from,
+                                                         @RequestParam(name = "size", defaultValue = "10")
+                                                         Integer size) throws IllegalAccessException {
+        if (from < 0) {
+            throw new IllegalStateException("Value of 'from' parameter cannot be less than 0");
+        }
+        int page = from / size;
+
+        return bookingService.getAllBookingForOwner(userId, state, page, size);
     }
 
     @GetMapping
     public List<AllBookingsAsList> getAllForUserByState(@RequestHeader(name = "X-Sharer-User-Id") long userId,
-                                                 @RequestParam(value = "state",
-                                                         defaultValue = "ALL",
-                                                         required = false) String state) throws IllegalAccessException {
-        return bookingService.getAllForUserByState(userId, state);
+                                                        @RequestParam(value = "state", defaultValue = "ALL")
+                                                        String state,
+                                                        @RequestParam(name = "from", defaultValue = "0")
+                                                         Integer from,
+                                                        @RequestParam(name = "size", defaultValue = "10")
+                                                        Integer size) throws IllegalAccessException {
+        if (from < 0) {
+            throw new IllegalStateException("Value of 'from' parameter cannot be less than 0");
+        }
+        int page = from / size;
+
+        return bookingService.getAllForUserByState(userId, state, page, size);
     }
 }

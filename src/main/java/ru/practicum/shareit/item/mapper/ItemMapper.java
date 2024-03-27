@@ -10,4 +10,13 @@ public interface ItemMapper {
     Item itemFromItemDto(ItemDto itemDto);
 
     ItemDto itemDtoFromItem(Item item);
+
+    static ItemDto toItemDtoRequest(Item item) {
+        return new ItemDto(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable(),
+                item.getRequest() != null ? item.getRequest().getId() : null);
+    }
 }

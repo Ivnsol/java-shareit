@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.enums.StatusOfBooking;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "bookings")
 public class AllBookingsAsList {

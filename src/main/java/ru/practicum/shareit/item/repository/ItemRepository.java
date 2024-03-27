@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -17,4 +18,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             " (LOWER(i.name) LIKE %:string% OR LOWER(i.description) LIKE %:string%)" +
             " AND i.available = true")
     List<Item> findByNameOrDescriptionContainingIgnoreCase(String string);
+
+    @Query("SELECT i FROM Item i WHERE i.request.id = :id")
+    List<Item> findAllByRequestId(@Param("id") long id);
 }

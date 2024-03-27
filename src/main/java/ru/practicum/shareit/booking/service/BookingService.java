@@ -13,7 +13,9 @@ public interface BookingService {
 
     BookingDto get(Long bookingId, long userId) throws IllegalAccessException;
 
-    List<AllBookingsAsList> getAllForUserByState(Long userId, String state) throws IllegalAccessException;
+    List<AllBookingsAsList> getAllForUserByState(Long userId, String state, int page, int size)
+            throws IllegalAccessException;
 
-    List<AllBookingsAsList> getAllBookingForOwner(Long userId, String state) throws IllegalAccessException;
+    List<AllBookingsAsList> getAllBookingForOwner(Long userId, String state, int page, int size)
+            throws IllegalAccessException;
 }
