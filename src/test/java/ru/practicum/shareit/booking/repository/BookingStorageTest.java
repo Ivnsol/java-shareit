@@ -38,12 +38,12 @@ public class BookingStorageTest {
 
         BookingStorage bookingStorage = mock(BookingStorage.class);
 
-        when(bookingStorage.findAllWhereItemIdIsOrderByEndDesc(anyList()))
+        when(bookingStorage.findAllByItemsList(anyList()))
                 .thenReturn(expectedBookings);
 
-        List<Booking> result = bookingStorage.findAllWhereItemIdIsOrderByEndDesc(itemsId);
+        List<Booking> result = bookingStorage.findAllByItemsList(itemsId);
 
-        verify(bookingStorage, times(1)).findAllWhereItemIdIsOrderByEndDesc(itemsId);
+        verify(bookingStorage, times(1)).findAllByItemsList(itemsId);
         assertEquals(expectedBookings, result);
     }
 

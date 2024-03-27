@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.service;
 
-import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.dto.AllBookingsAsList;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
@@ -14,9 +13,9 @@ public interface BookingService {
 
     BookingDto get(Long bookingId, long userId) throws IllegalAccessException;
 
-    List<AllBookingsAsList> getAllForUserByState(Long userId, String state, Pageable pageRequest)
+    List<AllBookingsAsList> getAllForUserByState(Long userId, String state, int page, int size)
             throws IllegalAccessException;
 
-    List<AllBookingsAsList> getAllBookingForOwner(Long userId, String state, Pageable pageRequest)
+    List<AllBookingsAsList> getAllBookingForOwner(Long userId, String state, int page, int size)
             throws IllegalAccessException;
 }

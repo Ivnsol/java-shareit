@@ -17,7 +17,7 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
     List<Booking> getByBookerIdStatePast(@Param("id") Long id, @Param("currentTime") LocalDateTime currentTime);
 
     @Query("SELECT b FROM Booking b WHERE b.itemId IN :itemsId ORDER BY b.end DESC")
-    List<Booking> findAllWhereItemIdIsOrderByEndDesc(List<Long> itemsId);
+    List<Booking> findAllByItemsList(List<Long> itemsId);
 
 
     Booking findFirstByItemIdAndStartBeforeAndStatusIsNotOrderByEndDesc(Long itemId, LocalDateTime end, StatusOfBooking status);

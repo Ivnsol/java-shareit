@@ -49,7 +49,7 @@ public class BookingController {
         }
         int page = from / size;
 
-        return bookingService.getAllBookingForOwner(userId, state, PageRequest.of(page, size));
+        return bookingService.getAllBookingForOwner(userId, state, page, size);
     }
 
     @GetMapping
@@ -65,6 +65,6 @@ public class BookingController {
         }
         int page = from / size;
 
-        return bookingService.getAllForUserByState(userId, state, PageRequest.of(page, size));
+        return bookingService.getAllForUserByState(userId, state, page, size);
     }
 }

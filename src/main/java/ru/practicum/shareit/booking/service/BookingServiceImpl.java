@@ -1,7 +1,9 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.AllBookingsAsList;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -22,9 +24,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,7 +60,7 @@ public class BookingServiceImpl implements BookingService {
             booking.setStatus(StatusOfBooking.WAITING);
             bookingStorage.save(booking);
 
-            BookingDto bookingDto = bookingCastomMapper.dtoFromBooking(booking,itemDto, userDto);
+            BookingDto bookingDto = bookingCastomMapper.dtoFromBooking(booking, itemDto, userDto);
 
             return bookingDto;
         } catch (EntityNotFoundException ex) {
@@ -112,15 +112,22 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<AllBookingsAsList> getAllForUserByState(Long userId, String state, Pageable pageRequest) {
+    public List<AllBookingsAsList> getAllForUserByState(Long userId, String state, int page, int pageSize) {
         State stateEnum = stringToEnum(state);
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
+        Pageable pageRequest = PageRequest.of(page, pageSize, sort);
+
         return getBookings(userId, stateEnum, pageRequest);
     }
 
     @Override
-    public List<AllBookingsAsList> getAllBookingForOwner(Long userId, String stringState, Pageable pageRequest) {
+    public List<AllBookingsAsList> getAllBookingForOwner(Long userId, String stringState, int page, int size) {
         User user = userMapper.userFromUserDto(userService.get(userId));
         List<Long> userItemsId = itemRepository.findAllByOwner(user).stream().map(Item::getId).collect(Collectors.toList());
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "start");
+        Pageable pageRequest = PageRequest.of(page, size, sort);
 
         State state = stringToEnum(stringState);
 
@@ -141,10 +148,13 @@ public class BookingServiceImpl implements BookingService {
                     bookingsForOwner = bookingStorageForList.getFutureBookingsForOwner(userItemsId, pageRequest);
                     break;
                 case WAITING:
-                    bookingsForOwner = bookingStorageForList.findBookingByOwnerAndStatusOrderByEndDesc(userItemsId, StatusOfBooking.WAITING, pageRequest);
+                    bookingsForOwner = bookingStorageForList.findBookingByOwnerAndStatusOrderByEndDesc(userItemsId,
+                            StatusOfBooking.WAITING,
+                            pageRequest);
                     break;
                 case REJECTED:
-                    bookingsForOwner = bookingStorageForList.findBookingByOwnerAndStatusOrderByEndDesc(userItemsId, StatusOfBooking.REJECTED, pageRequest);
+                    bookingsForOwner = bookingStorageForList.findBookingByOwnerAndStatusOrderByEndDesc(userItemsId,
+                            StatusOfBooking.REJECTED, pageRequest);
                     break;
                 default:
                     throw new IllegalArgumentException();
@@ -174,10 +184,12 @@ public class BookingServiceImpl implements BookingService {
                 bookings = bookingStorageForList.getFutureBookingsForBooker(userIdValue, pageRequest);
                 break;
             case WAITING:
-                bookings = bookingStorageForList.findBookingByBookerAndStatusOrderByEndDesc(userIdValue, StatusOfBooking.WAITING, pageRequest);
+                bookings = bookingStorageForList.findBookingByBookerAndStatusOrderByEndDesc(userIdValue,
+                        StatusOfBooking.WAITING, pageRequest);
                 break;
             case REJECTED:
-                bookings = bookingStorageForList.findBookingByBookerAndStatusOrderByEndDesc(userIdValue, StatusOfBooking.REJECTED, pageRequest);
+                bookings = bookingStorageForList.findBookingByBookerAndStatusOrderByEndDesc(userIdValue,
+                        StatusOfBooking.REJECTED, pageRequest);
                 break;
             default:
                 bookings = new ArrayList<>();
@@ -185,7 +197,6 @@ public class BookingServiceImpl implements BookingService {
 
         return bookings;
     }
-
 
     private Booking checkExist(Long bookingId) {
         Optional<Booking> booking = bookingStorage.findById(bookingId);

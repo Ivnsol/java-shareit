@@ -161,7 +161,7 @@ public class BookingServiceImplTest {
         when(userMapper.userDtoFromUser(any())).thenReturn(userDto);
         when(itemRepository.findAllByOwner(any())).thenReturn(items);
 
-        List<AllBookingsAsList> result = bookingService.getAllBookingForOwner(userId, stringState, pageRequest);
+        List<AllBookingsAsList> result = bookingService.getAllBookingForOwner(userId, stringState, 10, 10);
 
         verify(bookingStorageForList, times(1)).getAllForOwner(any(), any());
     }
@@ -183,12 +183,12 @@ public class BookingServiceImplTest {
 
         List<String> stateValues = List.of("ALL", "CURRENT", "PAST", "FUTURE", "WAITING", "REJECTED");
         for (String state : stateValues) {
-            List<AllBookingsAsList> result = bookingService.getAllBookingForOwner(userId, state, pageRequest);
+            List<AllBookingsAsList> result = bookingService.getAllBookingForOwner(userId, state, 10, 10);
             verifyBookingMethodCalled(state);
         }
 
         items.clear();
-        assertThrows(IllegalStateException.class, () -> bookingService.getAllBookingForOwner(userId, stringState, pageRequest));
+        assertThrows(IllegalStateException.class, () -> bookingService.getAllBookingForOwner(userId, stringState, 10, 10));
     }
 
     private void verifyBookingMethodCalled(String state) {
@@ -228,7 +228,7 @@ public class BookingServiceImplTest {
         when(itemRepository.findAllByOwner(any())).thenReturn(items);
         when(userService.get(any())).thenReturn(userDto);
 
-        bookingService.getAllForUserByState(userId, stringState, pageRequest);
+        bookingService.getAllForUserByState(userId, stringState, 10, 10);
         verify(bookingStorageForList, times(1)).findAllByBookerOrderByEndDesc(any(), any());
     }
 
@@ -247,11 +247,12 @@ public class BookingServiceImplTest {
 
         List<String> stateValues = List.of("ALL", "CURRENT", "PAST", "FUTURE", "WAITING", "REJECTED");
         for (String state : stateValues) {
-            bookingService.getAllForUserByState(userId, state, pageRequest);
+            bookingService.getAllForUserByState(userId, state, 10, 10);
             verifyBookingUserMethodCalled(state);
         }
 
-        assertThrows(IllegalArgumentException.class, () -> bookingService.getAllForUserByState(userId, "UNKNOWN", pageRequest));
+        assertThrows(IllegalArgumentException.class, () -> bookingService.getAllForUserByState(userId, "UNKNOWN",
+                10, 10));
     }
 
     private void verifyBookingUserMethodCalled(String state) {

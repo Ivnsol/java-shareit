@@ -141,7 +141,7 @@ class BookingControllerTest {
 
     @Test
     void getByOwner() throws Exception {
-        when(bookingService.getAllBookingForOwner(anyLong(), any(), any()))
+        when(bookingService.getAllBookingForOwner(anyLong(), any(), anyInt(), anyInt()))
                 .thenReturn(List.of(allBookingsAsList));
 
         mvc.perform(get("/bookings/owner")
@@ -158,12 +158,12 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$[0].end", is(allBookingsAsList.getEnd().toString())))
                 .andExpect(jsonPath("$[0].status", is(allBookingsAsList.getStatus().toString())));
 
-        verify(bookingService, times(1)).getAllBookingForOwner(anyLong(), any(), any());
+        verify(bookingService, times(1)).getAllBookingForOwner(anyLong(), any(), anyInt(), anyInt());
     }
 
     @Test
     void getByUser() throws Exception {
-        when(bookingService.getAllForUserByState(anyLong(), any(), any()))
+        when(bookingService.getAllForUserByState(anyLong(), any(), anyInt(), anyInt()))
                 .thenReturn(List.of(allBookingsAsList));
 
         mvc.perform(get("/bookings/")
@@ -180,7 +180,7 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$[0].end", is(allBookingsAsList.getEnd().toString())))
                 .andExpect(jsonPath("$[0].status", is(allBookingsAsList.getStatus().toString())));
 
-        verify(bookingService, times(1)).getAllForUserByState(anyLong(), any(), any());
+        verify(bookingService, times(1)).getAllForUserByState(anyLong(), any(), anyInt(), anyInt());
     }
 
     @Test
